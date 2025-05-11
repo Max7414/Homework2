@@ -110,7 +110,7 @@ fun HomeScreen(
     ) { innerPadding ->
         HomeBody(
             taskList = homeUiState.taskList,
-            onItemClick = navigateToItemUpdate,
+            onTaskClick = navigateToItemUpdate,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding,
         )
@@ -120,7 +120,7 @@ fun HomeScreen(
 @Composable
 private fun HomeBody(
     taskList: List<Task>,
-    onItemClick: (Int) -> Unit,
+    onTaskClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -138,7 +138,7 @@ private fun HomeBody(
         } else {
             InventoryList(
                 taskList = taskList,
-                onItemClick = { onItemClick(it.id) },
+                onItemClick = { onTaskClick(it.id) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -191,7 +191,7 @@ private fun InventoryItem(
                 )
             }
             Text(
-                text = stringResource(R.string.in_stock, task.quantity),
+                text = stringResource(R.string.in_stock, task.priority),
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -203,8 +203,8 @@ private fun InventoryItem(
 fun HomeBodyPreview() {
     InventoryTheme {
         HomeBody(listOf(
-            Task(1, "Game", 100.0, 20), Task(2, "Pen", 200.0, 30), Task(3, "TV", 300.0, 50)
-        ), onItemClick = {})
+            Task(1, "Task1", "High"), Task(2, "Task2", "High"), Task(3, "Task3", "Low")
+        ), onTaskClick = {})
     }
 }
 
@@ -212,7 +212,7 @@ fun HomeBodyPreview() {
 @Composable
 fun HomeBodyEmptyListPreview() {
     InventoryTheme {
-        HomeBody(listOf(), onItemClick = {})
+        HomeBody(listOf(), onTaskClick = {})
     }
 }
 
@@ -221,7 +221,7 @@ fun HomeBodyEmptyListPreview() {
 fun InventoryItemPreview() {
     InventoryTheme {
         InventoryItem(
-            Task(1, "Game", 100.0, 20),
+            Task(1, "Task1", "High"),
         )
     }
 }
