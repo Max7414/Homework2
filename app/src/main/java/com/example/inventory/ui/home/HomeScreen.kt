@@ -184,10 +184,6 @@ private fun InventoryItem(
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.weight(1f))
-                Text(
-                    text = "WAITING TO BE REMOVE",
-                    style = MaterialTheme.typography.titleMedium
-                )
             }
             Text(
                 text = stringResource(R.string.in_stock, task.priority),
