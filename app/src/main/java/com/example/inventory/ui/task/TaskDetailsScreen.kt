@@ -213,16 +213,7 @@ fun TaskDetails(
                     )
                 )
             )
-            TaskDetailsRow(
-                labelResID = R.string.price,
-                taskDetail = "READY TO BE REMOVE",
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
-                )
-            )
+
         }
 
     }
