@@ -24,9 +24,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.inventory.InventoryApplication
 import com.example.inventory.ui.home.HomeViewModel
-import com.example.inventory.ui.item.ItemDetailsViewModel
-import com.example.inventory.ui.item.ItemEditViewModel
-import com.example.inventory.ui.item.ItemEntryViewModel
+import com.example.inventory.ui.task.ItemDetailsViewModel
+import com.example.inventory.ui.task.TaskEditViewModel
+import com.example.inventory.ui.task.ItemEntryViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Inventory app
@@ -35,7 +35,7 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         // Initializer for ItemEditViewModel
         initializer {
-            ItemEditViewModel(
+            TaskEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.tasksRepository
             )

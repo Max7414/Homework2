@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

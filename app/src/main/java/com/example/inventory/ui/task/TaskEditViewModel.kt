@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel to retrieve and update an item from the [TasksRepository]'s data source.
  */
-class ItemEditViewModel(
+class TaskEditViewModel(
     savedStateHandle: SavedStateHandle,
     private val tasksRepository: TasksRepository
 ) : ViewModel() {

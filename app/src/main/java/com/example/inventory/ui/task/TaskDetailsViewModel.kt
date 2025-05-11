@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -35,7 +35,7 @@ class ItemDetailsViewModel(
     private val tasksRepository: TasksRepository,
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[ItemDetailsDestination.itemIdArg])
+    private val itemId: Int = checkNotNull(savedStateHandle[TaskDetailsDestination.taskIdArg])
 
     /**
      * Holds the item details ui state. The data is retrieved from [TasksRepository] and mapped to

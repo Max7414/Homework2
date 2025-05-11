@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -66,11 +66,11 @@ import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 import kotlinx.coroutines.launch
 
-object ItemDetailsDestination : NavigationDestination {
+object TaskDetailsDestination : NavigationDestination {
     override val route = "item_details"
-    override val titleRes = R.string.item_detail_title
-    const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    override val titleRes = R.string.task_detail_title
+    const val taskIdArg = "itemId"
+    val routeWithArgs = "$route/{$taskIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +86,7 @@ fun ItemDetailsScreen(
     Scaffold(
         topBar = {
             InventoryTopAppBar(
-                title = stringResource(ItemDetailsDestination.titleRes),
+                title = stringResource(TaskDetailsDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
@@ -103,7 +103,7 @@ fun ItemDetailsScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_item_title),
+                    contentDescription = stringResource(R.string.edit_task_title),
                 )
             }
         },
@@ -194,7 +194,7 @@ fun ItemDetails(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
             ItemDetailsRow(
-                labelResID = R.string.item,
+                labelResID = R.string.task,
                 itemDetail = task.name,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -139,7 +139,7 @@ fun ItemInputForm(
         OutlinedTextField(
             value = itemDetails.name,
             onValueChange = { onValueChange(itemDetails.copy(name = it)) },
-            label = { Text(stringResource(R.string.item_name_req)) },
+            label = { Text(stringResource(R.string.task_name_req)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -153,7 +153,7 @@ fun ItemInputForm(
             value = itemDetails.price,
             onValueChange = { onValueChange(itemDetails.copy(price = it)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            label = { Text(stringResource(R.string.item_price_req)) },
+            label = { Text(stringResource(R.string.task_price_req)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,

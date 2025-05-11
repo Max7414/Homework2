@@ -59,7 +59,7 @@ import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.data.Task
 import com.example.inventory.ui.AppViewModelProvider
-import com.example.inventory.ui.item.formatedPrice
+import com.example.inventory.ui.task.formatedPrice
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 
