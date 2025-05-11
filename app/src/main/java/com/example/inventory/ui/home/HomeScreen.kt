@@ -185,6 +185,7 @@ private fun InventoryItem(
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
+                    text = "WAITING TO BE REMOVE",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
