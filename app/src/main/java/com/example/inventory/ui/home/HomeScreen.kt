@@ -47,6 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
@@ -169,8 +170,17 @@ private fun InventoryList(
 private fun InventoryItem(
     task: Task, modifier: Modifier = Modifier
 ) {
+    val cardColor = when (task.priority.lowercase()) {
+        "high" -> MaterialTheme.colorScheme.errorContainer
+        "medium" -> Color(0xFFFFF9C4)
+        "low" -> Color(0xFFC8E6C9)
+        else -> MaterialTheme.colorScheme.surface
+    }
+
     Card(
-        modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
@@ -184,11 +194,12 @@ private fun InventoryItem(
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.weight(1f))
+
+                Text(
+                    text = stringResource(R.string.in_stock, task.priority),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
-            Text(
-                text = stringResource(R.string.in_stock, task.priority),
-                style = MaterialTheme.typography.titleMedium
-            )
         }
     }
 }
@@ -198,7 +209,7 @@ private fun InventoryItem(
 fun HomeBodyPreview() {
     InventoryTheme {
         HomeBody(listOf(
-            Task(1, "Task1", "High"), Task(2, "Task2", "High"), Task(3, "Task3", "Low")
+            Task(1, "Task1", "High"), Task(2, "Task2", "Medium"), Task(3, "Task3", "Low")
         ), onTaskClick = {})
     }
 }
@@ -216,7 +227,7 @@ fun HomeBodyEmptyListPreview() {
 fun InventoryItemPreview() {
     InventoryTheme {
         InventoryItem(
-            Task(1, "Task1", "High"),
+            Task(1, "Task1", "Medium"),
         )
     }
 }
