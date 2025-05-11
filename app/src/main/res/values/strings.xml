@@ -30,7 +30,7 @@
     <string name="price">Price</string>
     <string name="quantity_in_stock">Quantity in stock</string>
     <string name="in_stock">%d in stock</string>
-    <string name="quantity_req">Quantity in Stock*</string>
+    <string name="priority_level">Priority level*</string>
     <string name="save_action">Save</string>
     <string name="sell">Sell</string>
     <string name="yes">Yes</string>

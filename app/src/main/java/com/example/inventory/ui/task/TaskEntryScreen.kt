@@ -47,8 +47,6 @@ import com.example.inventory.ui.AppViewModelProvider
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 import kotlinx.coroutines.launch
-import java.util.Currency
-import java.util.Locale
 
 object ItemEntryDestination : NavigationDestination {
     override val route = "item_entry"
@@ -149,27 +147,12 @@ fun ItemInputForm(
             enabled = enabled,
             singleLine = true
         )
-        OutlinedTextField(
-            value = "READY TO BE REMOVE",
-            onValueChange = { //onValueChange(taskDetails.copy(price = it))
-                },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            label = { Text(stringResource(R.string.task_price_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            leadingIcon = { Text(Currency.getInstance(Locale.getDefault()).symbol) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
+
         OutlinedTextField(
             value = taskDetails.priority,
             onValueChange = { onValueChange(taskDetails.copy(priority = it)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(stringResource(R.string.quantity_req)) },
+            label = { Text(stringResource(R.string.priority_level)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
