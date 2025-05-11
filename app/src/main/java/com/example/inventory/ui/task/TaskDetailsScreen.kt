@@ -148,14 +148,6 @@ private fun TaskDetailsBody(
         TaskDetails(
             task = taskDetailsUiState.taskDetails.toTask(), modifier = Modifier.fillMaxWidth()
         )
-        Button(
-            onClick = onSellTask,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small,
-            //enabled = !taskDetailsUiState.outOfStock
-        ) {
-            Text(stringResource(R.string.sell))
-        }
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,
