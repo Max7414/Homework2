@@ -264,7 +264,7 @@ private fun DeleteConfirmationDialog(
 fun TaskDetailsScreenPreview() {
     InventoryTheme {
         TaskDetailsBody(TaskDetailsUiState(
-            taskDetails = TaskDetails(1, "Pen", "$100", "10")
+            taskDetails = TaskDetails(1, "Task1", "High")
         ), onSellTask = {}, onDelete = {})
     }
 }
