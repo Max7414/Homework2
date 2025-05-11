@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -60,40 +60,40 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
-import com.example.inventory.data.Item
+import com.example.inventory.data.Task
 import com.example.inventory.ui.AppViewModelProvider
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 import kotlinx.coroutines.launch
 
-object ItemDetailsDestination : NavigationDestination {
-    override val route = "item_details"
-    override val titleRes = R.string.item_detail_title
-    const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+object TaskDetailsDestination : NavigationDestination {
+    override val route = "task_details"
+    override val titleRes = R.string.task_detail_title
+    const val taskIdArg = "taskId"
+    val routeWithArgs = "$route/{$taskIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemDetailsScreen(
-    navigateToEditItem: (Int) -> Unit,
+fun TaskDetailsScreen(
+    navigateToEditTask: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TaskDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             InventoryTopAppBar(
-                title = stringResource(ItemDetailsDestination.titleRes),
+                title = stringResource(TaskDetailsDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditItem(uiState.value.itemDetails.id) },
+                onClick = { navigateToEditTask(uiState.value.taskDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .padding(
@@ -103,22 +103,22 @@ fun ItemDetailsScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_item_title),
+                    contentDescription = stringResource(R.string.edit_task_title),
                 )
             }
         },
         modifier = modifier,
     ) { innerPadding ->
-        ItemDetailsBody(
-            itemDetailsUiState = uiState.value,
-            onSellItem = { viewModel.reduceQuantityByOne() },
+        TaskDetailsBody(
+            taskDetailsUiState = uiState.value,
+            onSellTask = { viewModel.reduceQuantityByOne() },
             onDelete = {
                 // Note: If the user rotates the screen very fast, the operation may get cancelled
-                // and the item may not be deleted from the Database. This is because when config
+                // and the task may not be deleted from the Database. This is because when config
                 // change occurs, the Activity will be recreated and the rememberCoroutineScope will
                 // be cancelled - since the scope is bound to composition.
                 coroutineScope.launch {
-                    viewModel.deleteItem()
+                    viewModel.deleteTask()
                     navigateBack()
                 }
             },
@@ -134,9 +134,9 @@ fun ItemDetailsScreen(
 }
 
 @Composable
-private fun ItemDetailsBody(
-    itemDetailsUiState: ItemDetailsUiState,
-    onSellItem: () -> Unit,
+private fun TaskDetailsBody(
+    taskDetailsUiState: TaskDetailsUiState,
+    onSellTask: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -145,17 +145,9 @@ private fun ItemDetailsBody(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-        ItemDetails(
-            item = itemDetailsUiState.itemDetails.toItem(), modifier = Modifier.fillMaxWidth()
+        TaskDetails(
+            task = taskDetailsUiState.taskDetails.toTask(), modifier = Modifier.fillMaxWidth()
         )
-        Button(
-            onClick = onSellItem,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small,
-            enabled = !itemDetailsUiState.outOfStock
-        ) {
-            Text(stringResource(R.string.sell))
-        }
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,
@@ -178,8 +170,8 @@ private fun ItemDetailsBody(
 
 
 @Composable
-fun ItemDetails(
-    item: Item, modifier: Modifier = Modifier
+fun TaskDetails(
+    task: Task, modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -193,9 +185,9 @@ fun ItemDetails(
                 .padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            ItemDetailsRow(
-                labelResID = R.string.item,
-                itemDetail = item.name,
+            TaskDetailsRow(
+                labelResID = R.string.task,
+                taskDetail = task.name,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -203,9 +195,9 @@ fun ItemDetails(
                     )
                 )
             )
-            ItemDetailsRow(
-                labelResID = R.string.quantity_in_stock,
-                itemDetail = item.quantity.toString(),
+            TaskDetailsRow(
+                labelResID = R.string.priority_level_show,
+                taskDetail = task.priority,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -213,29 +205,20 @@ fun ItemDetails(
                     )
                 )
             )
-            ItemDetailsRow(
-                labelResID = R.string.price,
-                itemDetail = item.formatedPrice(),
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
-                )
-            )
+
         }
 
     }
 }
 
 @Composable
-private fun ItemDetailsRow(
-    @StringRes labelResID: Int, itemDetail: String, modifier: Modifier = Modifier
+private fun TaskDetailsRow(
+    @StringRes labelResID: Int, taskDetail: String, modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
         Text(text = stringResource(labelResID))
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = itemDetail, fontWeight = FontWeight.Bold)
+        Text(text = taskDetail, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -261,10 +244,10 @@ private fun DeleteConfirmationDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun ItemDetailsScreenPreview() {
+fun TaskDetailsScreenPreview() {
     InventoryTheme {
-        ItemDetailsBody(ItemDetailsUiState(
-            outOfStock = true, itemDetails = ItemDetails(1, "Pen", "$100", "10")
-        ), onSellItem = {}, onDelete = {})
+        TaskDetailsBody(TaskDetailsUiState(
+            taskDetails = TaskDetails(1, "Task1", "High")
+        ), onSellTask = {}, onDelete = {})
     }
 }

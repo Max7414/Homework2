@@ -47,6 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
@@ -57,9 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
-import com.example.inventory.data.Item
+import com.example.inventory.data.Task
 import com.example.inventory.ui.AppViewModelProvider
-import com.example.inventory.ui.item.formatedPrice
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 
@@ -103,14 +103,14 @@ fun HomeScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.item_entry_title)
+                    contentDescription = stringResource(R.string.task_entry_title)
                 )
             }
         },
     ) { innerPadding ->
         HomeBody(
-            itemList = homeUiState.itemList,
-            onItemClick = navigateToItemUpdate,
+            taskList = homeUiState.taskList,
+            onTaskClick = navigateToItemUpdate,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding,
         )
@@ -119,8 +119,8 @@ fun HomeScreen(
 
 @Composable
 private fun HomeBody(
-    itemList: List<Item>,
-    onItemClick: (Int) -> Unit,
+    taskList: List<Task>,
+    onTaskClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -128,17 +128,17 @@ private fun HomeBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        if (itemList.isEmpty()) {
+        if (taskList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),
+                text = stringResource(R.string.no_task_description),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
             InventoryList(
-                itemList = itemList,
-                onItemClick = { onItemClick(it.id) },
+                taskList = taskList,
+                onItemClick = { onTaskClick(it.id) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -148,8 +148,8 @@ private fun HomeBody(
 
 @Composable
 private fun InventoryList(
-    itemList: List<Item>,
-    onItemClick: (Item) -> Unit,
+    taskList: List<Task>,
+    onItemClick: (Task) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -157,8 +157,8 @@ private fun InventoryList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            InventoryItem(item = item,
+        items(items = taskList, key = { it.id }) { item ->
+            InventoryItem(task = item,
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .clickable { onItemClick(item) })
@@ -168,10 +168,19 @@ private fun InventoryList(
 
 @Composable
 private fun InventoryItem(
-    item: Item, modifier: Modifier = Modifier
+    task: Task, modifier: Modifier = Modifier
 ) {
+    val cardColor = when (task.priority.lowercase()) {
+        "high" -> MaterialTheme.colorScheme.errorContainer
+        "medium" -> Color(0xFFFFF9C4)
+        "low" -> Color(0xFFC8E6C9)
+        else -> MaterialTheme.colorScheme.surface
+    }
+
     Card(
-        modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
@@ -181,19 +190,16 @@ private fun InventoryItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = item.name,
+                    text = task.name,
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.weight(1f))
+
                 Text(
-                    text = item.formatedPrice(),
+                    text = stringResource(R.string.in_stock, task.priority),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-            Text(
-                text = stringResource(R.string.in_stock, item.quantity),
-                style = MaterialTheme.typography.titleMedium
-            )
         }
     }
 }
@@ -203,8 +209,8 @@ private fun InventoryItem(
 fun HomeBodyPreview() {
     InventoryTheme {
         HomeBody(listOf(
-            Item(1, "Game", 100.0, 20), Item(2, "Pen", 200.0, 30), Item(3, "TV", 300.0, 50)
-        ), onItemClick = {})
+            Task(1, "Task1", "High"), Task(2, "Task2", "Medium"), Task(3, "Task3", "Low")
+        ), onTaskClick = {})
     }
 }
 
@@ -212,7 +218,7 @@ fun HomeBodyPreview() {
 @Composable
 fun HomeBodyEmptyListPreview() {
     InventoryTheme {
-        HomeBody(listOf(), onItemClick = {})
+        HomeBody(listOf(), onTaskClick = {})
     }
 }
 
@@ -221,7 +227,7 @@ fun HomeBodyEmptyListPreview() {
 fun InventoryItemPreview() {
     InventoryTheme {
         InventoryItem(
-            Item(1, "Game", 100.0, 20),
+            Task(1, "Task1", "Medium"),
         )
     }
 }

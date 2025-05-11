@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.inventory.data.ItemsRepository
+import com.example.inventory.data.TasksRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -28,47 +28,44 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel to retrieve, update and delete an item from the [ItemsRepository]'s data source.
+ * ViewModel to retrieve, update and delete an item from the [TasksRepository]'s data source.
  */
-class ItemDetailsViewModel(
+class TaskDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository,
+    private val tasksRepository: TasksRepository,
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[ItemDetailsDestination.itemIdArg])
+    private val itemId: Int = checkNotNull(savedStateHandle[TaskDetailsDestination.taskIdArg])
 
     /**
-     * Holds the item details ui state. The data is retrieved from [ItemsRepository] and mapped to
+     * Holds the item details ui state. The data is retrieved from [TasksRepository] and mapped to
      * the UI state.
      */
-    val uiState: StateFlow<ItemDetailsUiState> =
-        itemsRepository.getItemStream(itemId)
+    val uiState: StateFlow<TaskDetailsUiState> =
+        tasksRepository.getTaskStream(itemId)
             .filterNotNull()
             .map {
-                ItemDetailsUiState(outOfStock = it.quantity <= 0, itemDetails = it.toItemDetails())
+                TaskDetailsUiState(taskDetails = it.toItemDetails())
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = ItemDetailsUiState()
+                initialValue = TaskDetailsUiState()
             )
 
     /**
-     * Reduces the item quantity by one and update the [ItemsRepository]'s data source.
+     * Reduces the item quantity by one and update the [TasksRepository]'s data source.
      */
     fun reduceQuantityByOne() {
         viewModelScope.launch {
-            val currentItem = uiState.value.itemDetails.toItem()
-            if (currentItem.quantity > 0) {
-                itemsRepository.updateItem(currentItem.copy(quantity = currentItem.quantity - 1))
-            }
+            val currentItem = uiState.value.taskDetails.toTask()
         }
     }
 
     /**
-     * Deletes the item from the [ItemsRepository]'s data source.
+     * Deletes the item from the [TasksRepository]'s data source.
      */
-    suspend fun deleteItem() {
-        itemsRepository.deleteItem(uiState.value.itemDetails.toItem())
+    suspend fun deleteTask() {
+        tasksRepository.deleteTask(uiState.value.taskDetails.toTask())
     }
 
     companion object {
@@ -79,7 +76,6 @@ class ItemDetailsViewModel(
 /**
  * UI state for ItemDetailsScreen
  */
-data class ItemDetailsUiState(
-    val outOfStock: Boolean = true,
-    val itemDetails: ItemDetails = ItemDetails()
+data class TaskDetailsUiState(
+    val taskDetails: TaskDetails = TaskDetails()
 )

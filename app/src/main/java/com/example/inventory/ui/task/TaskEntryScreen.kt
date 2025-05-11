@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.inventory.ui.item
+package com.example.inventory.ui.task
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,12 +47,10 @@ import com.example.inventory.ui.AppViewModelProvider
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
 import kotlinx.coroutines.launch
-import java.util.Currency
-import java.util.Locale
 
 object ItemEntryDestination : NavigationDestination {
     override val route = "item_entry"
-    override val titleRes = R.string.item_entry_title
+    override val titleRes = R.string.task_entry_title
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +99,7 @@ fun ItemEntryScreen(
 @Composable
 fun ItemEntryBody(
     itemUiState: ItemUiState,
-    onItemValueChange: (ItemDetails) -> Unit,
+    onItemValueChange: (TaskDetails) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -110,7 +108,7 @@ fun ItemEntryBody(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large))
     ) {
         ItemInputForm(
-            itemDetails = itemUiState.itemDetails,
+            taskDetails = itemUiState.taskDetails,
             onValueChange = onItemValueChange,
             modifier = Modifier.fillMaxWidth()
         )
@@ -127,9 +125,9 @@ fun ItemEntryBody(
 
 @Composable
 fun ItemInputForm(
-    itemDetails: ItemDetails,
+    taskDetails: TaskDetails,
     modifier: Modifier = Modifier,
-    onValueChange: (ItemDetails) -> Unit = {},
+    onValueChange: (TaskDetails) -> Unit = {},
     enabled: Boolean = true
 ) {
     Column(
@@ -137,9 +135,9 @@ fun ItemInputForm(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         OutlinedTextField(
-            value = itemDetails.name,
-            onValueChange = { onValueChange(itemDetails.copy(name = it)) },
-            label = { Text(stringResource(R.string.item_name_req)) },
+            value = taskDetails.name,
+            onValueChange = { onValueChange(taskDetails.copy(name = it)) },
+            label = { Text(stringResource(R.string.task_name_req)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -149,26 +147,12 @@ fun ItemInputForm(
             enabled = enabled,
             singleLine = true
         )
+
         OutlinedTextField(
-            value = itemDetails.price,
-            onValueChange = { onValueChange(itemDetails.copy(price = it)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            label = { Text(stringResource(R.string.item_price_req)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            leadingIcon = { Text(Currency.getInstance(Locale.getDefault()).symbol) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = itemDetails.quantity,
-            onValueChange = { onValueChange(itemDetails.copy(quantity = it)) },
+            value = taskDetails.priority,
+            onValueChange = { onValueChange(taskDetails.copy(priority = it)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text(stringResource(R.string.quantity_req)) },
+            label = { Text(stringResource(R.string.priority_level)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -192,8 +176,8 @@ fun ItemInputForm(
 private fun ItemEntryScreenPreview() {
     InventoryTheme {
         ItemEntryBody(itemUiState = ItemUiState(
-            ItemDetails(
-                name = "Item name", price = "10.00", quantity = "5"
+            TaskDetails(
+                name = "Task name",  priority = "LOW"
             )
         ), onItemValueChange = {}, onSaveClick = {})
     }
