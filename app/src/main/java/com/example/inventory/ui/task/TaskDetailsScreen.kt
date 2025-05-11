@@ -215,7 +215,7 @@ fun TaskDetails(
             )
             TaskDetailsRow(
                 labelResID = R.string.price,
-                taskDetail = task.formatedPrice(),
+                taskDetail = "READY TO BE REMOVE",
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
