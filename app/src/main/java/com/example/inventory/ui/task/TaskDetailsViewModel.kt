@@ -45,7 +45,7 @@ class TaskDetailsViewModel(
         tasksRepository.getTaskStream(itemId)
             .filterNotNull()
             .map {
-                TaskDetailsUiState(outOfStock = it.quantity <= 0, taskDetails = it.toItemDetails())
+                TaskDetailsUiState(taskDetails = it.toItemDetails())
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -58,9 +58,6 @@ class TaskDetailsViewModel(
     fun reduceQuantityByOne() {
         viewModelScope.launch {
             val currentItem = uiState.value.taskDetails.toTask()
-            if (currentItem.quantity > 0) {
-                tasksRepository.updateTask(currentItem.copy(quantity = currentItem.quantity - 1))
-            }
         }
     }
 
@@ -80,6 +77,5 @@ class TaskDetailsViewModel(
  * UI state for ItemDetailsScreen
  */
 data class TaskDetailsUiState(
-    val outOfStock: Boolean = true,
     val taskDetails: TaskDetails = TaskDetails()
 )

@@ -205,7 +205,7 @@ fun TaskDetails(
             )
             TaskDetailsRow(
                 labelResID = R.string.quantity_in_stock,
-                taskDetail = task.quantity.toString(),
+                taskDetail = task.priority.toString(),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
