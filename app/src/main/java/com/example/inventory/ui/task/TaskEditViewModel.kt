@@ -72,7 +72,7 @@ class TaskEditViewModel(
 
     private fun validateInput(uiState: TaskDetails = itemUiState.taskDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
+            name.isNotBlank() && price.isNotBlank() && priority.isNotBlank()
         }
     }
 }

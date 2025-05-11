@@ -152,7 +152,7 @@ private fun TaskDetailsBody(
             onClick = onSellTask,
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
-            enabled = !taskDetailsUiState.outOfStock
+            //enabled = !taskDetailsUiState.outOfStock
         ) {
             Text(stringResource(R.string.sell))
         }
@@ -205,7 +205,7 @@ fun TaskDetails(
             )
             TaskDetailsRow(
                 labelResID = R.string.quantity_in_stock,
-                taskDetail = task.priority.toString(),
+                taskDetail = task.priority,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -264,7 +264,7 @@ private fun DeleteConfirmationDialog(
 fun TaskDetailsScreenPreview() {
     InventoryTheme {
         TaskDetailsBody(TaskDetailsUiState(
-            outOfStock = true, taskDetails = TaskDetails(1, "Pen", "$100", "10")
+            taskDetails = TaskDetails(1, "Pen", "$100", "10")
         ), onSellTask = {}, onDelete = {})
     }
 }

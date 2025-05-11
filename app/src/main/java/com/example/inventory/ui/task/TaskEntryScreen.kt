@@ -165,8 +165,8 @@ fun ItemInputForm(
             singleLine = true
         )
         OutlinedTextField(
-            value = taskDetails.quantity,
-            onValueChange = { onValueChange(taskDetails.copy(quantity = it)) },
+            value = taskDetails.priority,
+            onValueChange = { onValueChange(taskDetails.copy(priority = it)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text(stringResource(R.string.quantity_req)) },
             colors = OutlinedTextFieldDefaults.colors(
@@ -193,7 +193,7 @@ private fun ItemEntryScreenPreview() {
     InventoryTheme {
         ItemEntryBody(itemUiState = ItemUiState(
             TaskDetails(
-                name = "Item name", price = "10.00", quantity = "5"
+                name = "Item name", price = "10.00", priority = "5"
             )
         ), onItemValueChange = {}, onSaveClick = {})
     }

@@ -55,7 +55,7 @@ class ItemEntryViewModel(private val tasksRepository: TasksRepository) : ViewMod
 
     private fun validateInput(uiState: TaskDetails = itemUiState.taskDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
+            name.isNotBlank() && priority.isNotBlank()
         }
     }
 }
@@ -71,8 +71,7 @@ data class ItemUiState(
 data class TaskDetails(
     val id: Int = 0,
     val name: String = "",
-    val price: String = "",
-    val quantity: String = "",
+    val priority: String = "",
 )
 
 /**
@@ -83,13 +82,9 @@ data class TaskDetails(
 fun TaskDetails.toTask(): Task = Task(
     id = id,
     name = name,
-    price = price.toDoubleOrNull() ?: 0.0,
-    quantity = quantity.toIntOrNull() ?: 0
+    priority = priority
 )
 
-fun Task.formatedPrice(): String {
-    return NumberFormat.getCurrencyInstance().format(price)
-}
 
 /**
  * Extension function to convert [Task] to [ItemUiState]
@@ -105,6 +100,5 @@ fun Task.toItemUiState(isEntryValid: Boolean = false): ItemUiState = ItemUiState
 fun Task.toItemDetails(): TaskDetails = TaskDetails(
     id = id,
     name = name,
-    price = price.toString(),
-    quantity = quantity.toString()
+    priority = priority
 )
