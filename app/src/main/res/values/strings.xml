@@ -25,10 +25,8 @@
     <string name="task_detail_title">Task Details</string>
     <string name="task_entry_title">Add Task</string>
     <string name="task_name_req">Task Name*</string>
-    <string name="task_price_req">Task Price*</string>
     <string name="no">No</string>
-    <string name="price">Price</string>
-    <string name="quantity_in_stock">Quantity in stock</string>
+    <string name="priority_level_show">Priority level</string>
     <string name="in_stock">%d in stock</string>
     <string name="priority_level">Priority level*</string>
     <string name="save_action">Save</string>
