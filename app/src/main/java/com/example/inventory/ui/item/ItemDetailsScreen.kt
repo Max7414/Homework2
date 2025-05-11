@@ -60,7 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
-import com.example.inventory.data.Item
+import com.example.inventory.data.Task
 import com.example.inventory.ui.AppViewModelProvider
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
@@ -146,7 +146,7 @@ private fun ItemDetailsBody(
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         ItemDetails(
-            item = itemDetailsUiState.itemDetails.toItem(), modifier = Modifier.fillMaxWidth()
+            task = itemDetailsUiState.itemDetails.toItem(), modifier = Modifier.fillMaxWidth()
         )
         Button(
             onClick = onSellItem,
@@ -179,7 +179,7 @@ private fun ItemDetailsBody(
 
 @Composable
 fun ItemDetails(
-    item: Item, modifier: Modifier = Modifier
+    task: Task, modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -195,7 +195,7 @@ fun ItemDetails(
         ) {
             ItemDetailsRow(
                 labelResID = R.string.item,
-                itemDetail = item.name,
+                itemDetail = task.name,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -205,7 +205,7 @@ fun ItemDetails(
             )
             ItemDetailsRow(
                 labelResID = R.string.quantity_in_stock,
-                itemDetail = item.quantity.toString(),
+                itemDetail = task.quantity.toString(),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -215,7 +215,7 @@ fun ItemDetails(
             )
             ItemDetailsRow(
                 labelResID = R.string.price,
-                itemDetail = item.formatedPrice(),
+                itemDetail = task.formatedPrice(),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
