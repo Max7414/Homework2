@@ -67,19 +67,19 @@ import com.example.inventory.ui.theme.InventoryTheme
 import kotlinx.coroutines.launch
 
 object TaskDetailsDestination : NavigationDestination {
-    override val route = "item_details"
+    override val route = "task_details"
     override val titleRes = R.string.task_detail_title
-    const val taskIdArg = "itemId"
+    const val taskIdArg = "taskId"
     val routeWithArgs = "$route/{$taskIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemDetailsScreen(
-    navigateToEditItem: (Int) -> Unit,
+fun TaskDetailsScreen(
+    navigateToEditTask: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TaskDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -93,7 +93,7 @@ fun ItemDetailsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditItem(uiState.value.itemDetails.id) },
+                onClick = { navigateToEditTask(uiState.value.taskDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .padding(
@@ -109,16 +109,16 @@ fun ItemDetailsScreen(
         },
         modifier = modifier,
     ) { innerPadding ->
-        ItemDetailsBody(
-            itemDetailsUiState = uiState.value,
-            onSellItem = { viewModel.reduceQuantityByOne() },
+        TaskDetailsBody(
+            taskDetailsUiState = uiState.value,
+            onSellTask = { viewModel.reduceQuantityByOne() },
             onDelete = {
                 // Note: If the user rotates the screen very fast, the operation may get cancelled
-                // and the item may not be deleted from the Database. This is because when config
+                // and the task may not be deleted from the Database. This is because when config
                 // change occurs, the Activity will be recreated and the rememberCoroutineScope will
                 // be cancelled - since the scope is bound to composition.
                 coroutineScope.launch {
-                    viewModel.deleteItem()
+                    viewModel.deleteTask()
                     navigateBack()
                 }
             },
@@ -134,9 +134,9 @@ fun ItemDetailsScreen(
 }
 
 @Composable
-private fun ItemDetailsBody(
-    itemDetailsUiState: ItemDetailsUiState,
-    onSellItem: () -> Unit,
+private fun TaskDetailsBody(
+    taskDetailsUiState: TaskDetailsUiState,
+    onSellTask: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -145,14 +145,14 @@ private fun ItemDetailsBody(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-        ItemDetails(
-            task = itemDetailsUiState.itemDetails.toItem(), modifier = Modifier.fillMaxWidth()
+        TaskDetails(
+            task = taskDetailsUiState.taskDetails.toTask(), modifier = Modifier.fillMaxWidth()
         )
         Button(
-            onClick = onSellItem,
+            onClick = onSellTask,
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
-            enabled = !itemDetailsUiState.outOfStock
+            enabled = !taskDetailsUiState.outOfStock
         ) {
             Text(stringResource(R.string.sell))
         }
@@ -178,7 +178,7 @@ private fun ItemDetailsBody(
 
 
 @Composable
-fun ItemDetails(
+fun TaskDetails(
     task: Task, modifier: Modifier = Modifier
 ) {
     Card(
@@ -193,9 +193,9 @@ fun ItemDetails(
                 .padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            ItemDetailsRow(
+            TaskDetailsRow(
                 labelResID = R.string.task,
-                itemDetail = task.name,
+                taskDetail = task.name,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -203,9 +203,9 @@ fun ItemDetails(
                     )
                 )
             )
-            ItemDetailsRow(
+            TaskDetailsRow(
                 labelResID = R.string.quantity_in_stock,
-                itemDetail = task.quantity.toString(),
+                taskDetail = task.quantity.toString(),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -213,9 +213,9 @@ fun ItemDetails(
                     )
                 )
             )
-            ItemDetailsRow(
+            TaskDetailsRow(
                 labelResID = R.string.price,
-                itemDetail = task.formatedPrice(),
+                taskDetail = task.formatedPrice(),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -229,13 +229,13 @@ fun ItemDetails(
 }
 
 @Composable
-private fun ItemDetailsRow(
-    @StringRes labelResID: Int, itemDetail: String, modifier: Modifier = Modifier
+private fun TaskDetailsRow(
+    @StringRes labelResID: Int, taskDetail: String, modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
         Text(text = stringResource(labelResID))
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = itemDetail, fontWeight = FontWeight.Bold)
+        Text(text = taskDetail, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -261,10 +261,10 @@ private fun DeleteConfirmationDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun ItemDetailsScreenPreview() {
+fun TaskDetailsScreenPreview() {
     InventoryTheme {
-        ItemDetailsBody(ItemDetailsUiState(
-            outOfStock = true, itemDetails = ItemDetails(1, "Pen", "$100", "10")
-        ), onSellItem = {}, onDelete = {})
+        TaskDetailsBody(TaskDetailsUiState(
+            outOfStock = true, taskDetails = TaskDetails(1, "Pen", "$100", "10")
+        ), onSellTask = {}, onDelete = {})
     }
 }

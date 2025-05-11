@@ -56,8 +56,8 @@ class TaskEditViewModel(
      * Update the item in the [TasksRepository]'s data source
      */
     suspend fun updateItem() {
-        if (validateInput(itemUiState.itemDetails)) {
-            tasksRepository.updateTask(itemUiState.itemDetails.toItem())
+        if (validateInput(itemUiState.taskDetails)) {
+            tasksRepository.updateTask(itemUiState.taskDetails.toTask())
         }
     }
 
@@ -65,12 +65,12 @@ class TaskEditViewModel(
      * Updates the [itemUiState] with the value provided in the argument. This method also triggers
      * a validation for input values.
      */
-    fun updateUiState(itemDetails: ItemDetails) {
+    fun updateUiState(taskDetails: TaskDetails) {
         itemUiState =
-            ItemUiState(itemDetails = itemDetails, isEntryValid = validateInput(itemDetails))
+            ItemUiState(taskDetails = taskDetails, isEntryValid = validateInput(taskDetails))
     }
 
-    private fun validateInput(uiState: ItemDetails = itemUiState.itemDetails): Boolean {
+    private fun validateInput(uiState: TaskDetails = itemUiState.taskDetails): Boolean {
         return with(uiState) {
             name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
         }

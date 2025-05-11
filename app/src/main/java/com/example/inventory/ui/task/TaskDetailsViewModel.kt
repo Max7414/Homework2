@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel to retrieve, update and delete an item from the [TasksRepository]'s data source.
  */
-class ItemDetailsViewModel(
+class TaskDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val tasksRepository: TasksRepository,
 ) : ViewModel() {
@@ -41,15 +41,15 @@ class ItemDetailsViewModel(
      * Holds the item details ui state. The data is retrieved from [TasksRepository] and mapped to
      * the UI state.
      */
-    val uiState: StateFlow<ItemDetailsUiState> =
+    val uiState: StateFlow<TaskDetailsUiState> =
         tasksRepository.getTaskStream(itemId)
             .filterNotNull()
             .map {
-                ItemDetailsUiState(outOfStock = it.quantity <= 0, itemDetails = it.toItemDetails())
+                TaskDetailsUiState(outOfStock = it.quantity <= 0, taskDetails = it.toItemDetails())
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = ItemDetailsUiState()
+                initialValue = TaskDetailsUiState()
             )
 
     /**
@@ -57,7 +57,7 @@ class ItemDetailsViewModel(
      */
     fun reduceQuantityByOne() {
         viewModelScope.launch {
-            val currentItem = uiState.value.itemDetails.toItem()
+            val currentItem = uiState.value.taskDetails.toTask()
             if (currentItem.quantity > 0) {
                 tasksRepository.updateTask(currentItem.copy(quantity = currentItem.quantity - 1))
             }
@@ -67,8 +67,8 @@ class ItemDetailsViewModel(
     /**
      * Deletes the item from the [TasksRepository]'s data source.
      */
-    suspend fun deleteItem() {
-        tasksRepository.deleteTask(uiState.value.itemDetails.toItem())
+    suspend fun deleteTask() {
+        tasksRepository.deleteTask(uiState.value.taskDetails.toTask())
     }
 
     companion object {
@@ -79,7 +79,7 @@ class ItemDetailsViewModel(
 /**
  * UI state for ItemDetailsScreen
  */
-data class ItemDetailsUiState(
+data class TaskDetailsUiState(
     val outOfStock: Boolean = true,
-    val itemDetails: ItemDetails = ItemDetails()
+    val taskDetails: TaskDetails = TaskDetails()
 )

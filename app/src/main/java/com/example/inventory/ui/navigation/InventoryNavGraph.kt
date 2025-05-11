@@ -26,7 +26,7 @@ import androidx.navigation.navArgument
 import com.example.inventory.ui.home.HomeDestination
 import com.example.inventory.ui.home.HomeScreen
 import com.example.inventory.ui.task.TaskDetailsDestination
-import com.example.inventory.ui.task.ItemDetailsScreen
+import com.example.inventory.ui.task.TaskDetailsScreen
 import com.example.inventory.ui.task.ItemEditDestination
 import com.example.inventory.ui.task.ItemEditScreen
 import com.example.inventory.ui.task.ItemEntryDestination
@@ -65,8 +65,8 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            ItemDetailsScreen(
-                navigateToEditItem = { navController.navigate("${ItemEditDestination.route}/$it") },
+            TaskDetailsScreen(
+                navigateToEditTask = { navController.navigate("${ItemEditDestination.route}/$it") },
                 navigateBack = { navController.navigateUp() }
             )
         }

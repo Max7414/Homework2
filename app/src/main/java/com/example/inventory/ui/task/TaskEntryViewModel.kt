@@ -39,9 +39,9 @@ class ItemEntryViewModel(private val tasksRepository: TasksRepository) : ViewMod
      * Updates the [itemUiState] with the value provided in the argument. This method also triggers
      * a validation for input values.
      */
-    fun updateUiState(itemDetails: ItemDetails) {
+    fun updateUiState(taskDetails: TaskDetails) {
         itemUiState =
-            ItemUiState(itemDetails = itemDetails, isEntryValid = validateInput(itemDetails))
+            ItemUiState(taskDetails = taskDetails, isEntryValid = validateInput(taskDetails))
     }
 
     /**
@@ -49,11 +49,11 @@ class ItemEntryViewModel(private val tasksRepository: TasksRepository) : ViewMod
      */
     suspend fun saveItem() {
         if (validateInput()) {
-            tasksRepository.insertTask(itemUiState.itemDetails.toItem())
+            tasksRepository.insertTask(itemUiState.taskDetails.toTask())
         }
     }
 
-    private fun validateInput(uiState: ItemDetails = itemUiState.itemDetails): Boolean {
+    private fun validateInput(uiState: TaskDetails = itemUiState.taskDetails): Boolean {
         return with(uiState) {
             name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
         }
@@ -64,11 +64,11 @@ class ItemEntryViewModel(private val tasksRepository: TasksRepository) : ViewMod
  * Represents Ui State for an Item.
  */
 data class ItemUiState(
-    val itemDetails: ItemDetails = ItemDetails(),
+    val taskDetails: TaskDetails = TaskDetails(),
     val isEntryValid: Boolean = false
 )
 
-data class ItemDetails(
+data class TaskDetails(
     val id: Int = 0,
     val name: String = "",
     val price: String = "",
@@ -76,11 +76,11 @@ data class ItemDetails(
 )
 
 /**
- * Extension function to convert [ItemUiState] to [Task]. If the value of [ItemDetails.price] is
+ * Extension function to convert [ItemUiState] to [Task]. If the value of [TaskDetails.price] is
  * not a valid [Double], then the price will be set to 0.0. Similarly if the value of
  * [ItemUiState] is not a valid [Int], then the quantity will be set to 0
  */
-fun ItemDetails.toItem(): Task = Task(
+fun TaskDetails.toTask(): Task = Task(
     id = id,
     name = name,
     price = price.toDoubleOrNull() ?: 0.0,
@@ -95,14 +95,14 @@ fun Task.formatedPrice(): String {
  * Extension function to convert [Task] to [ItemUiState]
  */
 fun Task.toItemUiState(isEntryValid: Boolean = false): ItemUiState = ItemUiState(
-    itemDetails = this.toItemDetails(),
+    taskDetails = this.toItemDetails(),
     isEntryValid = isEntryValid
 )
 
 /**
- * Extension function to convert [Task] to [ItemDetails]
+ * Extension function to convert [Task] to [TaskDetails]
  */
-fun Task.toItemDetails(): ItemDetails = ItemDetails(
+fun Task.toItemDetails(): TaskDetails = TaskDetails(
     id = id,
     name = name,
     price = price.toString(),
