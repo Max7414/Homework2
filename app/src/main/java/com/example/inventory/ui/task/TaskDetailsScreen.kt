@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -42,6 +44,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,13 +57,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
@@ -147,6 +155,9 @@ private fun TaskDetailsBody(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+        var inputText by rememberSaveable { mutableStateOf(taskDetailsUiState.taskDetails.name) }
+        var editable by rememberSaveable { mutableStateOf(false) }           // 編輯開關
+        var selectedPriority by rememberSaveable { mutableStateOf(taskDetailsUiState.taskDetails.priority) }
         TaskDetails(
             task = taskDetailsUiState.taskDetails.toTask(), modifier = Modifier.fillMaxWidth()
         )
@@ -170,6 +181,51 @@ private fun TaskDetailsBody(
 
         ) {
             Text(stringResource(R.string.delete))
+        }
+
+        OutlinedTextField(
+            value = inputText,
+            onValueChange = { inputText = it },
+            label = { Text("輸入任務名稱") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            enabled = editable
+        )
+        val priorities = listOf("High", "Medium", "Low")
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            priorities.forEach { level ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f)
+                        .selectable(
+                            selected = (selectedPriority == level),
+                            onClick = { if (editable) selectedPriority = level },
+                            role = Role.RadioButton
+                        )
+                ) {
+                    RadioButton(
+                        selected = (selectedPriority == level),
+                        onClick = null, // 整個 Row 都可點
+                        enabled = editable
+                    )
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
+                    Text(
+                        level,
+                        color = when (level.lowercase()) {
+                            "high" -> MaterialTheme.colorScheme.error       // High：紅
+                            "medium" -> Color(0xFFFBC02D)                  // Medium：黃
+                            else -> Color(0xFF388E3C)                      // Low：綠
+                        }
+                    )
+                }
+            }
         }
         if (deleteConfirmationRequired) {
             DeleteConfirmationDialog(
