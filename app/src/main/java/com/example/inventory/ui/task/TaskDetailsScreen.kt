@@ -161,16 +161,6 @@ private fun TaskDetailsBody(
         TaskDetails(
             task = taskDetailsUiState.taskDetails.toTask(), modifier = Modifier.fillMaxWidth()
         )
-
-        OutlinedButton(
-            onClick = {  },//TODO
-            shape = MaterialTheme.shapes.small,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.edit))
-        }
-
-
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,
@@ -182,6 +172,17 @@ private fun TaskDetailsBody(
         ) {
             Text(stringResource(R.string.delete))
         }
+
+
+        OutlinedButton(
+            onClick = {  },//TODO
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.edit))
+        }
+
+
 
         OutlinedTextField(
             value = inputText,
