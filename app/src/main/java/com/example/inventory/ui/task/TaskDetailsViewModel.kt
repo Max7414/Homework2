@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.inventory.ui.task
 
 import androidx.lifecycle.SavedStateHandle
@@ -28,44 +12,52 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel to retrieve, update and delete an item from the [TasksRepository]'s data source.
+ * ViewModel to retrieve, update and delete a task from the [TasksRepository]'s data source.
  */
 class TaskDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val tasksRepository: TasksRepository,
+    private val tasksRepository: TasksRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[TaskDetailsDestination.taskIdArg])
+    // 從 navigation arguments 拿到要顯示的 taskId
+    private val taskId: Int = checkNotNull(savedStateHandle[TaskDetailsDestination.taskIdArg])
 
     /**
-     * Holds the item details ui state. The data is retrieved from [TasksRepository] and mapped to
-     * the UI state.
+     * uiState 會隨著資料庫中該筆 task 更新自動推送最新值
      */
     val uiState: StateFlow<TaskDetailsUiState> =
-        tasksRepository.getTaskStream(itemId)
-            .filterNotNull()
-            .map {
-                TaskDetailsUiState(taskDetails = it.toItemDetails())
-            }.stateIn(
+        tasksRepository
+            .getTaskStream(taskId)                // 回傳 Flow<TaskEntity?>
+            .filterNotNull()                      // 避免 null
+            .map { entity ->
+                // Map Entity -> UI state
+                TaskDetailsUiState(taskDetails = entity.toItemDetails())
+            }
+            .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = TaskDetailsUiState()
             )
 
     /**
-     * Reduces the item quantity by one and update the [TasksRepository]'s data source.
+     * 刪除該 task
      */
-    fun reduceQuantityByOne() {
+    fun deleteTask() {
         viewModelScope.launch {
-            val currentItem = uiState.value.taskDetails.toTask()
+            tasksRepository.deleteTask(uiState.value.taskDetails.toTask())
         }
     }
 
     /**
-     * Deletes the item from the [TasksRepository]'s data source.
+     * 更新該 task 的 name 與 priority
      */
-    suspend fun deleteTask() {
-        tasksRepository.deleteTask(uiState.value.taskDetails.toTask())
+    fun updateTask(name: String, priority: String) {
+        viewModelScope.launch {
+            // 構造一個新的 TaskData 並交給 repository 更新
+            val updated = uiState.value.taskDetails.copy(name = name, priority = priority)
+            tasksRepository.updateTask(updated.toTask())
+            // 不需要手動刷新，getTaskStream 會自動 emit 最新的資料
+        }
     }
 
     companion object {
@@ -74,7 +66,7 @@ class TaskDetailsViewModel(
 }
 
 /**
- * UI state for ItemDetailsScreen
+ * UI state for TaskDetailsScreen
  */
 data class TaskDetailsUiState(
     val taskDetails: TaskDetails = TaskDetails()

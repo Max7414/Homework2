@@ -1,19 +1,4 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+// TaskDetailsScreen.kt
 package com.example.inventory.ui.task
 
 import androidx.annotation.StringRes
@@ -35,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -91,8 +75,9 @@ fun TaskDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: TaskDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             InventoryTopAppBar(
@@ -103,7 +88,7 @@ fun TaskDetailsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditTask(uiState.value.taskDetails.id) },
+                onClick = { navigateToEditTask(uiState.taskDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
                     .padding(
@@ -120,17 +105,18 @@ fun TaskDetailsScreen(
         modifier = modifier,
     ) { innerPadding ->
         TaskDetailsBody(
-            taskDetailsUiState = uiState.value,
-            onSellTask = { viewModel.reduceQuantityByOne() },
+            taskDetailsUiState = uiState,
             onDelete = {
-                // Note: If the user rotates the screen very fast, the operation may get cancelled
-                // and the task may not be deleted from the Database. This is because when config
-                // change occurs, the Activity will be recreated and the rememberCoroutineScope will
-                // be cancelled - since the scope is bound to composition.
                 coroutineScope.launch {
                     viewModel.deleteTask()
                     navigateBack()
                 }
+            },
+            onConfirm = { newName, newPriority ->
+                viewModel.updateTask(
+                    name = newName,
+                    priority = newPriority
+                )
             },
             modifier = Modifier
                 .padding(
@@ -146,60 +132,87 @@ fun TaskDetailsScreen(
 @Composable
 private fun TaskDetailsBody(
     taskDetailsUiState: TaskDetailsUiState,
-    onSellTask: () -> Unit,
     onDelete: () -> Unit,
+    onConfirm: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
+        // 狀態
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+        var editable by rememberSaveable { mutableStateOf(false) }
         var inputText by rememberSaveable { mutableStateOf(taskDetailsUiState.taskDetails.name) }
-        var editable by rememberSaveable { mutableStateOf(false) }           // 編輯開關
         var selectedPriority by rememberSaveable { mutableStateOf(taskDetailsUiState.taskDetails.priority) }
+
+        // 原始卡片顯示
         TaskDetails(
-            task = taskDetailsUiState.taskDetails.toTask(), modifier = Modifier.fillMaxWidth()
+            task = taskDetailsUiState.taskDetails.toTask(),
+            modifier = Modifier.fillMaxWidth()
         )
+
+        // 刪除按鈕
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer  // 你可以換成其他顏色，例如 MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             )
-
         ) {
             Text(stringResource(R.string.delete))
         }
 
-
-        OutlinedButton(
-            onClick = {  },//TODO
-            shape = MaterialTheme.shapes.small,
+        // Edit / Cancel & Confirm
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.edit))
+            if (!editable) {
+                OutlinedButton(onClick = { editable = true }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.edit))
+                }
+            } else {
+                OutlinedButton(onClick = {
+                    // rollback
+                    editable = false
+                    inputText = taskDetailsUiState.taskDetails.name
+                    selectedPriority = taskDetailsUiState.taskDetails.priority
+                }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.cancel))
+                }
+                OutlinedButton(onClick = {
+                    editable = false
+                    onConfirm(inputText, selectedPriority)
+                }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
         }
 
-
-
+        // 編輯輸入框
         OutlinedTextField(
             value = inputText,
             onValueChange = { inputText = it },
-            label = { Text("輸入任務名稱") },
+            label = { Text(stringResource(R.string.task)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
             enabled = editable
         )
+
+        // Priority RadioGroup
         val priorities = listOf("High", "Medium", "Low")
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             priorities.forEach { level ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -213,41 +226,55 @@ private fun TaskDetailsBody(
                 ) {
                     RadioButton(
                         selected = (selectedPriority == level),
-                        onClick = null, // 整個 Row 都可點
+                        onClick = null,
                         enabled = editable
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
                     Text(
                         level,
                         color = when (level.lowercase()) {
-                            "high" -> MaterialTheme.colorScheme.error       // High：紅
-                            "medium" -> Color(0xFFFBC02D)                  // Medium：黃
-                            else -> Color(0xFF388E3C)                      // Low：綠
-                        }
+                            "high" -> MaterialTheme.colorScheme.error
+                            "medium" -> Color(0xFFFBC02D)
+                            else -> Color(0xFF388E3C)
+                        },
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
         }
+
+        // 刪除確認對話框
         if (deleteConfirmationRequired) {
-            DeleteConfirmationDialog(
-                onDeleteConfirm = {
-                    deleteConfirmationRequired = false
-                    onDelete()
+            AlertDialog(
+                onDismissRequest = { /* no-op */ },
+                title = { Text(stringResource(R.string.attention)) },
+                text = { Text(stringResource(R.string.delete_question)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        deleteConfirmationRequired = false
+                        onDelete()
+                    }) {
+                        Text(stringResource(R.string.yes))
+                    }
                 },
-                onDeleteCancel = { deleteConfirmationRequired = false },
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+                dismissButton = {
+                    TextButton(onClick = { deleteConfirmationRequired = false }) {
+                        Text(stringResource(R.string.no))
+                    }
+                }
             )
         }
     }
 }
 
-
 @Composable
 fun TaskDetails(
-    task: Task, modifier: Modifier = Modifier
+    task: Task,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier, colors = CardDefaults.cardColors(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
@@ -258,69 +285,36 @@ fun TaskDetails(
                 .padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            TaskDetailsRow(
-                labelResID = R.string.task,
-                taskDetail = task.name,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
-                )
-            )
-            TaskDetailsRow(
-                labelResID = R.string.priority_level_show,
-                taskDetail = task.priority,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
-                )
-            )
-
+            TaskDetailsRow(R.string.task, task.name)
+            TaskDetailsRow(R.string.priority_level_show, task.priority)
         }
-
     }
 }
 
 @Composable
 private fun TaskDetailsRow(
-    @StringRes labelResID: Int, taskDetail: String, modifier: Modifier = Modifier
+    @StringRes labelResID: Int,
+    taskDetail: String
 ) {
-    Row(modifier = modifier) {
+    Row(
+        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_medium))
+    ) {
         Text(text = stringResource(labelResID))
         Spacer(modifier = Modifier.weight(1f))
         Text(text = taskDetail, fontWeight = FontWeight.Bold)
     }
 }
 
-@Composable
-private fun DeleteConfirmationDialog(
-    onDeleteConfirm: () -> Unit, onDeleteCancel: () -> Unit, modifier: Modifier = Modifier
-) {
-    AlertDialog(onDismissRequest = { /* Do nothing */ },
-        title = { Text(stringResource(R.string.attention)) },
-        text = { Text(stringResource(R.string.delete_question)) },
-        modifier = modifier,
-        dismissButton = {
-            TextButton(onClick = onDeleteCancel) {
-                Text(text = stringResource(R.string.no))
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDeleteConfirm) {
-                Text(text = stringResource(R.string.yes))
-            }
-        })
-}
-
 @Preview(showBackground = true)
 @Composable
 fun TaskDetailsScreenPreview() {
     InventoryTheme {
-        TaskDetailsBody(TaskDetailsUiState(
-            taskDetails = TaskDetails(1, "Task1", "High")
-        ), onSellTask = {}, onDelete = {})
+        TaskDetailsBody(
+            taskDetailsUiState = TaskDetailsUiState(
+                taskDetails = TaskDetails(1, "示範任務", "Medium")
+            ),
+            onDelete = { /* no-op */ },
+            onConfirm = { _, _ -> /* no-op */ }
+        )
     }
 }
